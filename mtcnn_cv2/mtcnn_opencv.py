@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
-根据https://github.com/ipazc/mtcnn对FaceNet中align的重新实现
-转换模型，使用OpenCV进行推理
-不依赖Tensorlow/keras
+Adapted from https://github.com/ipazc/mtcnn with re-implementation for align.
+The model is converted to onnx format, leading to inference by OpenCV which decouple the dependencies on TensorFlow/Keras.
 """
 import os
 import imghdr
@@ -171,7 +170,8 @@ class MTCNN(object):
 
             inter = w * h
 
-            if method is 'Min':
+            # if method is 'Min':
+            if method == 'Min':
                 o = inter / np.minimum(area[i], area[idx])
             else:
                 o = inter / (area[i] + area[idx] - inter)
@@ -243,12 +243,8 @@ class MTCNN(object):
         boundingbox[:, 0:4] = np.transpose(np.vstack([b1, b2, b3, b4]))
         return boundingbox
 
-    def detect_faces(self, img) -> list:
-        """
-        Detects bounding boxes from the specified image.
-        :param img: image to process
-        :return: list containing all the bounding boxes detected with their keypoints.
-        """
+    def detect_faces_raw(self, img):
+        # This function may be helpful for follow-up model processing.
         if img is None or not hasattr(img, "shape"):
             raise Exception("Image not valid.")
 
@@ -267,7 +263,16 @@ class MTCNN(object):
         for stage in stages:
             result = stage(img, result[0], result[1])
 
-        [total_boxes, points] = result
+        return result  # total_boxes, points
+
+    def detect_faces(self, img) -> list:
+        """
+        Detects bounding boxes from the specified image.
+        :param img: image to process
+        :return: list containing all the bounding boxes detected with their keypoints. box: (x, y, w, h), point: (x, y)
+        """
+
+        total_boxes, points = self.detect_faces_raw(img)
 
         bounding_boxes = []
 

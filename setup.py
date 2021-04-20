@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mtcnn-opencv",
-    version="1.0.2",
+    version="1.0.3",
     author="linxiaohui",
     author_email="llinxiaohui@126.com",
     description="MTCNN face detection using OpenCV",
