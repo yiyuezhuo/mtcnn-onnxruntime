@@ -13,8 +13,9 @@ Select one method from below:
 
 ## USAGE
 ```python
+
 import cv2
-from mtcnn_cv2 import MTCNN
+from mtcnn_ort import MTCNN
 
 detector = MTCNN()
 test_pic = "t.jpg"
@@ -50,8 +51,13 @@ detector.detect_faces_raw(image)
         [228.3274  ]], dtype=float32))
 """
 
-import cv2
+```
 
+Illustration:
+
+```python
+
+import cv2
 
 if len(result) > 0:
     bounding_box = result[0]["box"]
@@ -76,4 +82,32 @@ with open(test_pic, "rb") as fp:
     marked_data = detector.mark_faces(fp.read())
 with open("marked.jpg", "wb") as fp:
     fp.write(marked_data)
+
+```
+
+Warped patch (then face recognition SOTA [ArcFace](https://github.com/deepinsight/insightface)) can consume it (otherwise, if one just use bounding box, what some models such as UltraNet can only make, the performance will significantly compromised.).
+
+```python
+
+from skimage import transform as trans
+import numpy as np
+
+image = cv2.cvtColor(cv2.imread(test_pic), cv2.COLOR_BGR2RGB)
+
+src = np.array([
+            [30.2946, 51.6963],
+            [65.5318, 51.5014],
+            [48.0252, 71.7366],
+            [33.5493, 92.3655],
+            [62.7299, 92.2041]], dtype=np.float32)
+src[:, 0] += 8.0
+
+landmark5 = detector.detect_faces_raw(image)[1].reshape(2, 5).T
+tform = trans.SimilarityTransform()
+tform.estimate(landmark5, src)
+M = tform.params[0:2, :]
+img = cv2.warpAffine(image, M, (112, 112),
+                        borderValue=0.0)
+cv2.imwrite("warped.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+
 ```
