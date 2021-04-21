@@ -1,4 +1,5 @@
-mtcnn_opencv.egg-info/
+mtcnn_onnxruntime.egg-info/
 .DS_Store
 .idea/
 *.pyc
+.vscode

@@ -3,18 +3,31 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
 setuptools.setup(
-    name="mtcnn-opencv",
-    version="1.0.3",
-    author="linxiaohui",
-    author_email="llinxiaohui@126.com",
-    description="MTCNN face detection using OpenCV",
+    name="mtcnn-onnxruntime",
+    version="0.0.1",
+    author="linxiaohui, yiyuezhuo",
+    author_email="yiyuezhuo@gmail.com",
+    install_requires=[
+        "opencv-python",
+        # "onnxruntime", # "Default" backend is still using opencv, since "onnxruntime" or `onnxruntime-gpu` can be chosen according to the hardware specification. 
+    ],
+    extras_require = { # `pip install mtcnn-onnxruntime[cpu]` or `pip install mtcnn-onnxruntime[gpu]``
+        'cpu': [
+            'onnxruntime'
+        ],
+        'gpu':[
+            'onnxruntime-gpu'
+        ]
+    },
+    description="MTCNN face detection using onnx runtime or OpenCV",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/linxiaohui/mtcnn-opencv",
+    url="https://github.com/yiyuezhuo/mtcnn-onnxruntime",
     packages=setuptools.find_packages(),
     package_data={
-        'mtcnn_cv2': ['pnet.onnx', 'rnet.onnx', 'onet.onnx']
+        'mtcnn_ort': ['pnet.onnx', 'rnet.onnx', 'onet.onnx']
     },
     classifiers=[
         "Programming Language :: Python :: 3",

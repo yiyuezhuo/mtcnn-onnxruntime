@@ -1,12 +1,17 @@
-MTCNN-OpenCV
-============
-MTCNN Face Detector using OpenCV, no reqiurement for tensorflow/pytorch.
+# MTCNN-onnx-runtime
 
-# INSTALLATION
-   * `pip3 install opencv-python` or `pip3 install opencv-python-headless`
-   * `pip3 install mtcnn-opencv`
+Adapted from [linxiaohui/mtcnn-opencv](https://github.com/linxiaohui/mtcnn-opencv).  Modifications include uses of onnx runtime as inference backend and provide a raw output API. Maybe this package should be a fork but I have already had a [forked version](https://github.com/yiyuezhuo/mtcnn-opencv) to address [another problem](https://github.com/linxiaohui/mtcnn-opencv), so I made a new package.
 
-# USAGE
+MTCNN Face Detector using ONNX-runtime OpenCV, no reqiurement for tensorflow/pytorch.
+
+## INSTALLATION
+Select one method from below:
+
+   * `pip install mtcnn-onnxruntime`: Use existing onnxruntime version in environment to run, if no onnxruntime is in the environment, `opencv` will be used as backend.
+   * `pip install mtcnn-onnxruntime[cpu]`: Install `mtcnn-onnxruntime` with `onnxruntime`
+   * `pip install mtcnn-onnxruntime[gpu]`: Install `mtcnn-onnxruntime` with `onnxruntime-gpu`
+
+## USAGE
 ```python
 import cv2
 from mtcnn_cv2 import MTCNN

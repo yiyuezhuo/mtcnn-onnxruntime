@@ -10,6 +10,8 @@ import imghdr
 import cv2
 import numpy as np
 
+from .onnx_runner import load_model
+
 class StageStatus(object):
     """
     Keeps status between MTCNN stages
@@ -33,7 +35,7 @@ class MTCNN(object):
         b) Detection of keypoints (left eye, right eye, nose, mouth_left, mouth_right)
     """
     def __init__(self, min_face_size: int = 20, steps_threshold: list = None,
-                 scale_factor: float = 0.709):
+                 scale_factor: float = 0.709, runner_cls=None):
         """
         Initializes the MTCNN.
         :param min_face_size: minimum size of the face to detect
@@ -50,9 +52,15 @@ class MTCNN(object):
         pnet_path = os.path.join(os.path.dirname(__file__), "pnet.onnx")
         rnet_path = os.path.join(os.path.dirname(__file__), "rnet.onnx")
         onet_path = os.path.join(os.path.dirname(__file__), "onet.onnx")
+        """
         self._pnet = cv2.dnn.readNetFromONNX(pnet_path)
         self._rnet = cv2.dnn.readNetFromONNX(rnet_path)
         self._onet = cv2.dnn.readNetFromONNX(onet_path)
+        """
+        self._pnet = load_model(pnet_path, runner_cls)
+        self._rnet = load_model(rnet_path, runner_cls)
+        self._onet = load_model(onet_path, runner_cls)
+
 
     @property
     def min_face_size(self):
@@ -337,8 +345,11 @@ class MTCNN(object):
             img_x = np.expand_dims(scaled_image, 0)
             img_y = np.transpose(img_x, (0, 2, 1, 3))
 
+            """
             self._pnet.setInput(img_y)
             out = self._pnet.forward(['conv2d_4', 'softmax'])
+            """
+            out = self._pnet(img_y)
 
             out0 = np.transpose(out[0], (0, 2, 1, 3))
             out1 = np.transpose(out[1], (0, 2, 1, 3))
@@ -406,8 +417,11 @@ class MTCNN(object):
         tempimg = (tempimg - 127.5) * 0.0078125
         tempimg1 = np.transpose(tempimg, (3, 1, 0, 2))
 
+        """
         self._rnet.setInput(tempimg1)
         out = self._rnet.forward(['dense_2', 'softmax_1'])
+        """
+        out = self._rnet(tempimg1)
 
         out0 = np.transpose(out[0])
         out1 = np.transpose(out[1])
@@ -462,8 +476,11 @@ class MTCNN(object):
         tempimg = (tempimg - 127.5) * 0.0078125
         tempimg1 = np.transpose(tempimg, (3, 1, 0, 2))
 
+        """
         self._onet.setInput(tempimg1)
         out = self._onet.forward(['dense_5', 'dense_6', 'softmax_2'])
+        """
+        out = self._onet(tempimg1)
         out0 = np.transpose(out[0])
         out1 = np.transpose(out[1])
         out2 = np.transpose(out[2])
